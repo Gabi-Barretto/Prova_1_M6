@@ -4,7 +4,6 @@ import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import Twist
 from turtlesim.msg import Pose
-from math import atan2
 from collections import deque
 import math
 from time import sleep
@@ -28,9 +27,10 @@ class TurtleController(Node):
         self.twist_msg_ = Twist()
         self.goal_position = deque()
         self.going_back = []
+        self.back = False
         self.current_position = [0, 0, 0]
 
-        #Coordenadas propostas, lembrando que o próprio turtlesim nao alcança elas........
+        #Coordenadas propostas, lembrando que o próprio turtlesim não alcança elas........
 
         self.goal_position.append([0.5, 0.0])
         self.goal_position.append([0.0, 0.5])
@@ -72,12 +72,17 @@ class TurtleController(Node):
         if self.distance(self.current_position[0], self.current_position[1], goal_x, goal_y) <= MAX_DIFF:
             self.going_back.append(next_point)
             msg.linear.x, msg.linear.y = 0.0, 0.0
-            self.goal_position.popleft()
+
+            #Condição para não tertarmos retirar o valor de uma pilha com o método da lista que era utilizado inicialmente
+            if self.back == False:
+                self.goal_position.popleft()
+            
             sleep(1)
             
             #Condição para a tartaruga voltar ao ponto inicial da fila
             if len(self.goal_position) == 0:
                 self.goal_position = self.going_back.copy()
+                self.back = True
                 
         if abs(y_diff) > MAX_DIFF:
             msg.linear.y = 0.5 if y_diff > 0 else -0.5
