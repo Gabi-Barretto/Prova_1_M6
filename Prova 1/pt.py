@@ -25,7 +25,9 @@ class TurtleController(Node):
         self.subscription_
 
         self.twist_msg_ = Twist()
+        #Fila para posições iniciais
         self.goal_position = deque()
+        #Pilha para voltarmos
         self.going_back = []
         self.back = False
         self.current_position = [0, 0, 0]
